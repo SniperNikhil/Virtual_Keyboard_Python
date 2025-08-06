@@ -2,6 +2,7 @@ from tkinter import *
 import pyautogui
 import pygetwindow as gw
 from pynput import mouse
+import time
 
 class Virtual_Keyboard:
     def __init__(self, root):
@@ -17,8 +18,21 @@ class Virtual_Keyboard:
         self.shift_pressed = False
 
         # Identify the virtual keyboard window to ignore clicks on it
-        self.virtual_keyboard_window = gw.getWindowsWithTitle("Virtual Keyboard")[0]
-
+        self.virtual_keyboard_window = None
+        max_attempts = 10
+        attempts = 0
+        while self.virtual_keyboard_window is None and attempts < max_attempts:
+            try:
+                self.virtual_keyboard_window = gw.getWindowsWithTitle("Virtual Keyboard")[0]
+            except IndexError:
+                time.sleep(0.5)  # Wait for 0.5 seconds before retrying
+                attempts += 1
+        
+        if self.virtual_keyboard_window is None:
+            print("Error: Virtual Keyboard window not found after multiple attempts.")
+            # Handle the error appropriately, e.g., exit or raise an exception
+            # For now, we'll let the program continue, but functionality might be impacted.
+            
         # Bind focus events
         self.root.bind("<FocusIn>", self.on_focus_in)
         self.root.bind("<FocusOut>", self.on_focus_out)
